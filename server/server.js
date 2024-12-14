@@ -27,10 +27,6 @@ server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 server.use(cookieParser());
 
-server.get("/", (req, res) => {
-  res.send("<h1>Front end in progress ... </h1>");
-});
-
 server.post("/register", (req, res) => {
   const { username, password, email } = req.body;
   console.log("User registered", { username, password, email });
@@ -47,11 +43,11 @@ server.post("/login", (req, res) => {
   res.cookie("loginToken", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
   });
 
   /*  This shouldn't be sent over json.
-      res.cookie is already setting the cookie at the headers response
+      res.cookie is already setting the cookie at the headers response but still needs a tweak
+      on headers and browser config to make it work
   */
   res.status(200).json({ token });
 });
@@ -64,10 +60,10 @@ server.get("/add/:docname", async (req, res) => {
   !doc
     ? (() => {
         newDoc.save();
-        res.status(201).send("<h1>Document created</h1>");
+        res.status(201);
       })()
     : (() => {
-        res.status(400).send("<h1>Document already exists</h1>");
+        res.status(400);
       })();
 
   newDoc.save();

@@ -1,18 +1,33 @@
 import App from "./App";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Route, Routes } from "react-router";
-import { LoginForm, RegisterForm, Documents } from "./components";
+import { BrowserRouter, Routes, Route } from "react-router";
+import { loadDocuments } from "./api";
+import {
+  LoginForm,
+  RegisterForm,
+  Documents,
+  ProtectedRoute,
+} from "./components";
 import "./index.css";
+import { paths } from "./constants";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/register" element={<RegisterForm />} />
-        <Route path="/doclist" element={<Documents />} />
+        <Route path={paths.home} element={<App />} />
+        <Route path={paths.login} element={<LoginForm />} />
+        <Route path={paths.register} element={<RegisterForm />} />
+        <Route
+          path={paths.documents}
+          element={
+            <ProtectedRoute>
+              <Documents />
+            </ProtectedRoute>
+          }
+          loader={loadDocuments}
+        />
       </Routes>
     </BrowserRouter>
   </StrictMode>
