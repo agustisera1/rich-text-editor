@@ -1,3 +1,4 @@
+import "../Home.css";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../hooks";
 import { useNavigate } from "react-router";
@@ -36,12 +37,12 @@ export const LoginForm = () => {
   }, [loginStatus, navigate]);
 
   return (
-    <div>
+    <section className="card">
       <input ref={usernameRef} type="text" placeholder="username" />
       <input ref={passwordRef} type="password" placeholder="password" />
       <button onClick={handleLogin} disabled={false}>
         Login user
       </button>
-    </div>
+    </section>
   );
 };

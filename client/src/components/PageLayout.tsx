@@ -1,15 +1,13 @@
 import React, { PropsWithChildren } from "react";
-import { Container, AppBar, Toolbar, Typography, Box } from "@mui/material";
+import "../Home.css";
 
 export const PageLayout: React.FC<PropsWithChildren> = ({ children }) => {
   return (
-    <Container maxWidth="lg">
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6">My Rich Text Editor</Typography>
-        </Toolbar>
-      </AppBar>
-      <Box mt={2}>{children}</Box>
-    </Container>
+    <div className="page-layout">
+      <nav className="navbar">
+        <h1 className="navbar-title">Page Title</h1>
+      </nav>
+      <div className="content">{children}</div>
+    </div>
   );
 };
