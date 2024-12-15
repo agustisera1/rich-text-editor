@@ -1,20 +1,21 @@
+import dotenv from "dotenv";
 import cors from "cors";
 import express from "express";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import { connect } from "mongoose";
 import { DocumentModel, UserModel } from "./models/index.js";
-import { SECRET_KEY, crossOriginOptions } from "./configs.js";
 
 async function connectToDatabase() {
-  await connect("mongodb://127.0.0.1:27017/nolte-docs");
+  await connect(process.env.DB_URI);
 }
 
+dotenv.config();
 connectToDatabase();
 
 const port = 3001;
 const server = express();
-server.use(cors(crossOriginOptions));
+server.use(cors({ origin: process.env.ORIGIN, credentials: true }));
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 server.use(cookieParser());
@@ -42,7 +43,7 @@ server.post("/logout", (req, res) => {
 
 server.post("/login", async (req, res) => {
   const { username, password } = req.body;
-  const token = jwt.sign({ username }, SECRET_KEY, {
+  const token = jwt.sign({ username }, process.env.SECRET_KEY, {
     expiresIn: "1h",
   });
 
