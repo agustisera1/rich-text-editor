@@ -1,4 +1,3 @@
-import "../Home.css";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../hooks";
 import { useNavigate } from "react-router";

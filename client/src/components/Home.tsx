@@ -1,4 +1,3 @@
-import "../Home.css";
 import "../index.css";
 import { useEffect } from "react";
 import { useAuth } from "../hooks";

@@ -1,5 +1,4 @@
 import React, { PropsWithChildren } from "react";
-import "../Home.css";
 import { useAuth } from "../hooks";
 
 export const PageLayout: React.FC<PropsWithChildren> = ({ children }) => {
@@ -8,14 +7,14 @@ export const PageLayout: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     <div className="page-layout">
       <nav className="navbar">
-        <h1 className="navbar-title">Page Title</h1>
+        <p className="nav-title">Nolte docs</p>
         {isLogged && user?.username && (
-          <button className="primary" onClick={logOut}>
-            LogOut
+          <button className="nav-button primary" onClick={logOut}>
+            {user.email.slice(0, 1).toUpperCase()}
           </button>
         )}
       </nav>
-      <div className="content">{children}</div>
+      <div className="page-content">{children}</div>
     </div>
   );
 };

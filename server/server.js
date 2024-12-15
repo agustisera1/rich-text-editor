@@ -22,7 +22,7 @@ server.use(cookieParser());
 server.post("/register", (req, res) => {
   const { username, password, email } = req.body;
   console.log("User registered", { username, password, email });
-  res.status(201);
+  res.status(201).json({ message: "User registered" });
 });
 
 server.post("/logout", (req, res) => {
@@ -41,7 +41,6 @@ server.post("/login", (req, res) => {
     expiresIn: "1h",
   });
 
-  console.log("User logged", { username, password });
   res.cookie("token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
