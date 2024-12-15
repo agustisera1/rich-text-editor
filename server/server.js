@@ -3,7 +3,7 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import { connect } from "mongoose";
-import { DocumentModel } from "./models/index.js";
+import { DocumentModel, UserModel } from "./models/index.js";
 import { SECRET_KEY, crossOriginOptions } from "./configs.js";
 
 async function connectToDatabase() {
@@ -19,10 +19,17 @@ server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 server.use(cookieParser());
 
-server.post("/register", (req, res) => {
+server.post("/register", async (req, res) => {
   const { username, password, email } = req.body;
-  console.log("User registered", { username, password, email });
-  res.status(201).json({ message: "User registered" });
+  try {
+    const user = await UserModel.findOne({ email });
+    if (user) throw new Error("User already exists");
+    const newUser = new UserModel({ username, email, password });
+    await newUser.save();
+    res.status(201).send({ success: true, message: "User created" });
+  } catch (error) {
+    res.status(400).send({ success: false, message: error.message });
+  }
 });
 
 server.post("/logout", (req, res) => {
@@ -33,26 +40,40 @@ server.post("/logout", (req, res) => {
   res.status(200).json({ message: "User logged out" });
 });
 
-server.post("/login", (req, res) => {
+server.post("/login", async (req, res) => {
   const { username, password } = req.body;
-  // find the email from DB
-  const email = "agustisera1@gmail.com";
   const token = jwt.sign({ username }, SECRET_KEY, {
     expiresIn: "1h",
   });
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-  });
-  res.cookie("username", username);
-  res.cookie("email", email);
+  try {
+    const user = await UserModel.findOne({ username });
+    if (!user) throw new Error("User not registered");
 
-  /*  This shouldn't be sent over json.
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) throw new Error("Invalid credentials");
+
+    res.cookie("username", username);
+    res.cookie("email", user.email);
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    });
+    /*
+      The token houldn't be sent over json.
       res.cookie is already setting the cookie at the headers response but still needs a tweak
       on headers and browser config to make it work
-  */
-  res.status(200).json({ token, username, email });
+    */
+    res.status(200).send({
+      success: true,
+      message: "Welcome!",
+      token,
+      username,
+      email: user.email,
+    });
+  } catch (error) {
+    res.status(400).send({ success: false, message: error.message });
+  }
 });
 
 server.get("/add/:docname", async (req, res) => {

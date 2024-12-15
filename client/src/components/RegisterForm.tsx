@@ -39,7 +39,7 @@ export const RegisterForm = () => {
         placeholder="password"
       />
 
-      <button type="submit" className="primary" >
+      <button type="submit" className="primary">
         Register
       </button>
     </form>
