@@ -6,4 +6,5 @@ export type ServiceResponse<D = unknown> = {
   error: null | string;
   success: boolean;
   data?: D
+  pending?: boolean;
 }
