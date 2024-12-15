@@ -20,6 +20,7 @@ server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 server.use(cookieParser());
 
+/* Auth endpoints */
 server.post("/register", async (req, res) => {
   const { username, password, email } = req.body;
   try {
@@ -77,26 +78,44 @@ server.post("/login", async (req, res) => {
   }
 });
 
-server.get("/add/:docname", async (req, res) => {
-  const { docname } = req.params;
-  const newDoc = new DocumentModel({ name: docname });
-
-  const doc = await DocumentModel.findOne({ name: docname });
-  !doc
-    ? (() => {
-        newDoc.save();
-        res.status(201);
-      })()
-    : (() => {
-        res.status(400);
-      })();
-
-  newDoc.save();
+/* Document endpoints */
+server.get("/documents", async (req, res) => {
+  const documents = await DocumentModel.find();
+  res.status(200).json({ documents });
 });
 
-server.get("/doclist", async (req, res) => {
-  const docs = await DocumentModel.find();
-  res.status(200).json(docs);
+server.post("/documents", async (req, res) => {
+  const { name, author } = req.body;
+  // Author is an OBJECT
+  try {
+    const document = new DocumentModel({ name, author });
+    await document.save();
+    res.status(201).json(document);
+  } catch (error) {
+    res.status(500).json({ error: "Error creating document" });
+  }
+});
+
+server.get("/documents/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const document = await DocumentModel.findById(id);
+    if (!document) throw new Error("Document not found");
+    res.status(200).send({ success: true, document });
+  } catch (error) {
+    res.status(400).send({ success: false, message: error.message });
+  }
+});
+
+server.delete("/documents/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const document = await DocumentModel.findByIdAndDelete(id);
+    if (!document) throw new Error("Document not found");
+    res.status(200).send({ success: true, message: "Document deleted" });
+  } catch (error) {
+    res.status(400).send({ success: false, message: error.message });
+  }
 });
 
 server.listen(port, () => {

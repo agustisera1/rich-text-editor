@@ -1,17 +1,33 @@
 import { useEffect, useState } from "react";
+import { getDocuments, TSerializedDocument } from "../api";
+import { ServiceResponse } from "../types/common";
 
-type TDocument = unknown;
+const initialState: ServiceResponse<TSerializedDocument[]> = {
+  error: null,
+  pending: false,
+  success: false,
+  data: [],
+};
 
 export const useDocuments = () => {
-  const [documents, setDocuments] = useState<TDocument[]>([]);
+  const [documentsResponse, setDocumentsResponse] =
+    useState<ServiceResponse<TSerializedDocument[]>>(initialState);
 
   useEffect(() => {
-    setDocuments([
-      { name: "foo", created: Date.now(), version: "1.0.1" },
-    ] as TDocument[]);
+    (async () => {
+      setDocumentsResponse({ ...documentsResponse, pending: true });
+      const response = await getDocuments();
+      setDocumentsResponse({ ...response, pending: false });
+    })();
+
+    return () => {
+      setDocumentsResponse(initialState);
+    };
   }, []);
 
   return {
-    documents,
+    documents: documentsResponse.data as TSerializedDocument[],
+    error: documentsResponse.error,
+    pending: documentsResponse.pending,
   };
 };

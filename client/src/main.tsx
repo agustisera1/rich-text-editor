@@ -2,7 +2,6 @@ import "./index.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
-import { loadDocuments } from "./api";
 import {
   LoginForm,
   RegisterForm,
@@ -39,7 +38,6 @@ createRoot(document.getElementById("root")!).render(
           <Route
             path={paths.documents}
             element={withPageLayout(<Documents />, true)}
-            loader={loadDocuments}
           />
         </Routes>
       </BrowserRouter>
