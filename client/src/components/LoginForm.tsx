@@ -7,6 +7,7 @@ import { paths } from "../constants";
 const initialState: ServiceResponse<null> = {
   success: false,
   error: null,
+  pending: false,
 };
 
 export const LoginForm = () => {
@@ -21,8 +22,11 @@ export const LoginForm = () => {
   const handleLogin = async () => {
     const username = usernameRef.current?.value;
     const password = passwordRef.current?.value;
-    if (username && password)
-      setLoginStatus(await logUser({ username, password }));
+    if (username && password) {
+      setLoginStatus({ ...loginStatus, pending: true });
+      const response = await logUser({ username, password });
+      setLoginStatus({ ...response, pending: false });
+    }
   };
 
   useEffect(() => {
@@ -40,7 +44,7 @@ export const LoginForm = () => {
       <input ref={usernameRef} type="text" placeholder="username" />
       <input ref={passwordRef} type="password" placeholder="password" />
       <button className="primary" onClick={handleLogin} disabled={false}>
-        Login
+        {loginStatus.pending ? "..." : "Login"}
       </button>
     </section>
   );
