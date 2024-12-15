@@ -8,6 +8,7 @@ import {
   Documents,
   ProtectedRoute,
   Home,
+  DocumentDetail,
 } from "./components";
 import { paths } from "./constants";
 import { PageLayout } from "./components/PageLayout";
@@ -38,7 +39,9 @@ createRoot(document.getElementById("root")!).render(
           <Route
             path={paths.documents}
             element={withPageLayout(<Documents />, true)}
-          />
+          >
+            <Route path={paths.document} element={<DocumentDetail />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </AuthProvider>
