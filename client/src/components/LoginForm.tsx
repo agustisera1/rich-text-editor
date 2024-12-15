@@ -32,16 +32,16 @@ export const LoginForm = () => {
     if (error) {
       alert("User unauthorized");
     }
-
     return () => setLoginStatus(initialState);
   }, [loginStatus, navigate]);
 
   return (
     <section className="card">
+      <p>Please enter your username and password to log in.</p>
       <input ref={usernameRef} type="text" placeholder="username" />
       <input ref={passwordRef} type="password" placeholder="password" />
-      <button onClick={handleLogin} disabled={false}>
-        Login user
+      <button className="primary" onClick={handleLogin} disabled={false}>
+        Login
       </button>
     </section>
   );

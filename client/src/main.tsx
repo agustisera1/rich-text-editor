@@ -11,24 +11,35 @@ import {
 } from "./components";
 import "./index.css";
 import { paths } from "./constants";
+import { PageLayout } from "./components/PageLayout";
+import { AuthProvider } from "./providers";
+
+const withPageLayout = (Component: JSX.Element, protect?: boolean) => {
+  if (protect)
+    return (
+      <ProtectedRoute>
+        <PageLayout>{Component}</PageLayout>
+      </ProtectedRoute>
+    );
+
+  return <PageLayout>{Component}</PageLayout>;
+};
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path={paths.home} element={<Home />} />
-        <Route path={paths.login} element={<LoginForm />} />
-        <Route path={paths.register} element={<RegisterForm />} />
-        <Route
-          path={paths.documents}
-          element={
-            <ProtectedRoute>
-              <Documents />
-            </ProtectedRoute>
-          }
-          loader={loadDocuments}
-        />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path={paths.home} element={<Home />} />
+          <Route path={paths.login} element={<LoginForm />} />
+          <Route path={paths.register} element={<RegisterForm />} />
+          <Route
+            path={paths.documents}
+            element={withPageLayout(<Documents />, true)}
+            loader={loadDocuments}
+          />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   </StrictMode>
 );

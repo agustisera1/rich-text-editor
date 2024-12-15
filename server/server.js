@@ -25,23 +25,35 @@ server.post("/register", (req, res) => {
   res.status(201);
 });
 
+server.post("/logout", (req, res) => {
+  console.log("User logout", req.body.username);
+  res.clearCookie("token");
+  res.clearCookie("username");
+  res.clearCookie("email");
+  res.status(200).json({ message: "User logged out" });
+});
+
 server.post("/login", (req, res) => {
   const { username, password } = req.body;
+  // find the email from DB
+  const email = "agustisera1@gmail.com";
   const token = jwt.sign({ username }, SECRET_KEY, {
     expiresIn: "1h",
   });
 
   console.log("User logged", { username, password });
-  res.cookie("loginToken", token, {
+  res.cookie("token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
   });
+  res.cookie("username", username);
+  res.cookie("email", email);
 
   /*  This shouldn't be sent over json.
       res.cookie is already setting the cookie at the headers response but still needs a tweak
       on headers and browser config to make it work
   */
-  res.status(200).json({ token });
+  res.status(200).json({ token, username, email });
 });
 
 server.get("/add/:docname", async (req, res) => {
