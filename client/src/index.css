@@ -83,7 +83,63 @@ nav {
 }
 
 .page-content {
+  width: 90vw;
+}
 
+.editor-wrapper {
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ProseMirror {
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-height: 300px;
+  height: fit-content;
+  outline: none;
+  text-align: left;
+}
+
+.active-btn {
+  background-color: #646cff;
+}
+
+.editor-button {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  color: white;
+  margin-right: 0.5rem;
+}
+
+.participant-avatar {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  color: white;
+  margin-left: 0.5rem;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #646cff;
+}
+
+.participants-container {
+  display: flex;
+  margin-right: 0.5rem;
+  justify-content: space-between;
+}
+
+.editor-buttons-container {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 0.5rem;
+  justify-content: space-between;
 }
 
 .nav-title {
