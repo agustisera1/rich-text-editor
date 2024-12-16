@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../hooks";
-import { ServiceResponse } from "../types/common";
+import { ServiceResponse } from "@api";
 import { paths } from "../constants";
 import { useNavigate } from "react-router";
 

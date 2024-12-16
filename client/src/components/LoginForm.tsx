@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../hooks";
 import { useNavigate } from "react-router";
-import { ServiceResponse } from "../types/common";
+import { ServiceResponse } from "@api";
 import { paths } from "../constants";
 
 const initialState: ServiceResponse<null> = {

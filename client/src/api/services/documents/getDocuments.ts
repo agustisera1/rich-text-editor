@@ -1,11 +1,14 @@
-import { ServiceResponse } from "../../types/common";
+import { serverURL } from "../../../constants";
+import { User } from "../../../providers/AuthContext";
+import { ServiceResponse } from "../types/common";
 
 type TDocument = {
   name: string;
   created: string;
-  author: string;
+  author: User;
   __v: number;
   _id: string;
+  lastModified: string;
 };
 
 export type TSerializedDocument = {
@@ -13,6 +16,8 @@ export type TSerializedDocument = {
   created: string;
   id: string;
   version: string;
+  author: User;
+  lastModified: string;
 };
 
 function serializeDocument({ __v, _id, ...rest }: TDocument) {
@@ -26,7 +31,7 @@ function serializeDocument({ __v, _id, ...rest }: TDocument) {
 export async function getDocuments(): Promise<
   ServiceResponse<TSerializedDocument[]>
 > {
-  return await fetch("http://localhost:3001/documents", { method: "GET" }).then(
+  return await fetch(`${serverURL}/documents`, { method: "GET" }).then(
     async (res) => {
       const documents = (await res
         .json()

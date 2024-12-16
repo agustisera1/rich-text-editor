@@ -14,7 +14,12 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
-
+    "paths": {
+      "@api": ["./src/api/index.ts"],
+      "@hooks": ["./src/hooks/index.ts"],
+      "@components": ["./src/components/index.ts"],
+      "@providers": ["./src/providers/index.ts"]
+    },
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,

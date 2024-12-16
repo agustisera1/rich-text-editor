@@ -4,6 +4,7 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import { connect } from "mongoose";
+import { Server } from "socket.io";
 import { DocumentModel, UserModel } from "./models/index.js";
 
 async function connectToDatabase() {
@@ -34,8 +35,7 @@ server.post("/register", async (req, res) => {
   }
 });
 
-server.post("/logout", (req, res) => {
-  console.log("User logout", req.body.username);
+server.post("/logout", (_, res) => {
   res.clearCookie("token");
   res.clearCookie("username");
   res.clearCookie("email");
@@ -62,9 +62,9 @@ server.post("/login", async (req, res) => {
       secure: process.env.NODE_ENV === "production",
     });
     /*
-      The token houldn't be sent over json.
-      res.cookie is already setting the cookie at the headers response but still needs a tweak
-      on headers and browser config to make it work
+      The token shouldn't be sent over json.
+      this is setting the cookie at the headers response but still needs a tweak
+      to make it work. Token must be removed from the response body.
     */
     res.status(200).send({
       success: true,
@@ -86,13 +86,31 @@ server.get("/documents", async (req, res) => {
 
 server.post("/documents", async (req, res) => {
   const { name, author } = req.body;
-  // Author is an OBJECT
   try {
-    const document = new DocumentModel({ name, author });
+    const document = new DocumentModel({
+      name,
+      author,
+    }); /* Content fallsback to "" */
     await document.save();
     res.status(201).json(document);
   } catch (error) {
-    res.status(500).json({ error: "Error creating document" });
+    res.status(500).json({ error: "Error while creating a new document" });
+  }
+});
+
+server.patch("/documents/:id", async (req, res) => {
+  const { id } = req.params;
+  const { name, content } = req.body;
+  try {
+    const document = await DocumentModel.findByIdAndUpdate(id, {
+      name,
+      content,
+      lastModified: new Date(),
+    });
+    if (!document) throw new Error("Document not found");
+    res.status(200).send({ success: true, message: "Document updated" });
+  } catch (error) {
+    res.status(400).send({ success: false, message: error.message });
   }
 });
 
@@ -118,6 +136,58 @@ server.delete("/documents/:id", async (req, res) => {
   }
 });
 
-server.listen(port, () => {
+const expressServer = server.listen(port, () => {
   console.info("App listening on port: ", port);
+});
+
+/* Socket connections */
+const participants = {};
+const io = new Server(expressServer, {
+  cors: {
+    origin: process.env.ORIGIN,
+  },
+});
+
+io.on("connection", (socket) => {
+  socket.on("join-document", async (documentId) => {
+    console.log("User joined");
+    const document = await DocumentModel.findById(documentId);
+    if (document) {
+      if (!participants[documentId]) {
+        participants[documentId] = [];
+      } else {
+        participants[documentId].push(socket.id);
+      }
+
+      socket.emit("users-connected", participants);
+      socket.join(documentId);
+      socket.emit("load-document", document.content);
+      socket.on("send-changes", (delta) => {
+        socket.broadcast.to(documentId).emit("recieve-changes", delta);
+      });
+
+      socket.on("autosave", async ({ content, name }) => {
+        console.log("Autosave called");
+        const result = await DocumentModel.findByIdAndUpdate(documentId, {
+          name,
+          content,
+          lastModified: new Date(),
+        });
+
+        if (!result)
+          socket.emit(
+            "alert",
+            "Failed to save the document. Please check your connection" /* Emmulate a network issue for autosave */
+          );
+      });
+    }
+
+    socket.on("disconnect", () => {
+      participants[documentId] = participants[documentId]?.filter(
+        (id) => id !== socket.id
+      );
+      socket.emit("users-connected", participants);
+      console.log("user disconnected");
+    });
+  });
 });

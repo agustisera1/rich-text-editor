@@ -1,63 +1,74 @@
 import StarterKit from "@tiptap/starter-kit";
-import { EditorProvider, useCurrentEditor, useEditor } from "@tiptap/react";
-import { BoldIcon, ItalicIcon } from "lucide-react";
+import { useEditor, Editor, EditorContent } from "@tiptap/react";
+import { useWebSocket } from "@hooks";
+import { useOutletContext, useParams } from "react-router";
+import { serverURL } from "../constants";
+import { useEffect, useState } from "react";
+import { MenuBar } from "./MenuBar";
+import { CursorPosition } from "./CursorPosition";
+import { EditorContext } from "../providers";
+import { TSerializedDocument } from "@api";
 
 const extensions = [StarterKit];
 
-const MenuBar = () => {
-  const participants = ["Alice", "Bob", "Charlie"];
-  const { editor } = useCurrentEditor();
-  if (!editor) return null;
-
-  /* More features implementation in the same way, bulleted list, strike, etc. */
-  const toggleItalic = () => {
-    editor.chain().focus().toggleItalic().run();
-  };
-
-  const toggleBold = () => {
-    editor.chain().focus().toggleBold().run();
-  };
-
-  return (
-    <div className="editor-buttons-container">
-      <div>
-        <button
-          className={`editor-button ${
-            editor.isActive("italic") && "active-btn"
-          }`}
-          onClick={toggleItalic}
-        >
-          <ItalicIcon size={15} />
-        </button>
-        <button
-          className={`editor-button ${editor.isActive("bold") && "active-btn"}`}
-          onClick={toggleBold}
-        >
-          <BoldIcon size={15} />
-        </button>
-      </div>
-      <div className="participants-container">
-        {participants.map((participant) => (
-          <div className="participant-avatar" key={participant}>
-            {participant[0].toUpperCase()}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
 export const DocumentDetail = () => {
-  // const { id } = useParams();
-  // const { documents } = useContext(EditorContext);
+  const [participants, setParticipants] = useState<string[]>([]);
+  /* WARNING: Use wss: protocol instead of HTTP */
+  const { socket } = useWebSocket(serverURL);
+  const { id: documentID } = useParams();
+  const { documents } = useOutletContext() as {
+    documents: TSerializedDocument[];
+  };
+
+  const onUpdate = ({ editor }: { editor: Editor }) => {
+    if (socket) {
+      const changes = editor.getJSON();
+      /* To be done:
+        - Set the cursor position for participants.
+        - Provide username initials for active avatar
+          const { from } = editor.state.selection;
+          const cursorPosition = editor.view.coordsAtPos(from);
+          socket.emit("cursor-position", { documentID, cursorPosition });      
+        */
+      socket.emit("send-changes", changes);
+    }
+  };
+
+  const editor = useEditor({
+    extensions,
+    autofocus: true,
+    onUpdate,
+  }) as Editor;
+
+  useEffect(() => {
+    if (socket && editor) {
+      socket.emit("join-document", documentID);
+      socket.on("users-connected", (users) => {
+        setParticipants(
+          users[documentID as string].filter(
+            (user: string) => user !== socket.id
+          )
+        );
+      });
+      socket.on("alert", (msg) => alert(msg));
+      socket.on("load-document", (document) => {
+        editor.commands.setContent(document);
+      });
+      socket.on("recieve-changes", (delta) => {
+        editor.commands.setContent(delta);
+      });
+    }
+  }, [socket, editor, documentID]);
+
   return (
     <div className="editor-wrapper">
-      <EditorProvider
-        content={"Document content here"}
-        extensions={extensions}
-        autofocus={true}
-        slotBefore={<MenuBar />}
-      ></EditorProvider>
+      <EditorContext.Provider
+        value={{ editor, documents, socket, participants }}
+      >
+        <MenuBar autosave={true} autosaveInterval={10} />
+        <CursorPosition />
+        <EditorContent editor={editor} />
+      </EditorContext.Provider>
     </div>
   );
 };

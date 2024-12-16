@@ -1,2 +1,2 @@
-export * from './AuthProvider';
-export * from './EditorContext';
+export * from "./AuthProvider";
+export * from "./EditorContext";

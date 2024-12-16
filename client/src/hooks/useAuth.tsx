@@ -3,7 +3,7 @@ import {
   logUser as logUserService,
   logOut as logOutUserService,
   createUser,
-} from "../api/services";
+} from "@api";
 import { useContext } from "react";
 import { AuthContext } from "../providers/AuthContext";
 

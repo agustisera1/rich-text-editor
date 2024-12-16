@@ -7,3 +7,6 @@ export const paths = {
   home: "/",
   notFound: "/notFound",
 };
+
+/* Move to vite .env file */
+export const serverURL = "http://localhost:3001";
