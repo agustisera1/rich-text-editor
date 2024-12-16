@@ -39,13 +39,16 @@ export const LoginForm = () => {
   }, [loginStatus, navigate]);
 
   return (
-    <section className="card">
-      <p>Please enter your username and password to log in.</p>
-      <input ref={usernameRef} type="text" placeholder="username" />
-      <input ref={passwordRef} type="password" placeholder="password" />
-      <button className="primary" onClick={handleLogin} disabled={false}>
-        {loginStatus.pending ? "..." : "Login"}
-      </button>
-    </section>
+    <>
+      <h1>Nolte docs</h1>
+      <section className="card">
+        <p>Please enter your username and password to log in.</p>
+        <input ref={usernameRef} type="text" placeholder="username" />
+        <input ref={passwordRef} type="password" placeholder="password" />
+        <button className="primary" onClick={handleLogin} disabled={false}>
+          {loginStatus.pending ? "..." : "Login"}
+        </button>
+      </section>
+    </>
   );
 };

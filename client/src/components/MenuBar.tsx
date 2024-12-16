@@ -28,7 +28,6 @@ export const MenuBar = ({
   const navigate = useNavigate();
 
   const saveDocument = useCallback(async () => {
-    console.log("save called");
     if (editor) {
       const { success } = await updateDocument(documentID, {
         content: editor.getText(),

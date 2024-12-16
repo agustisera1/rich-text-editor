@@ -11,6 +11,13 @@ const DocumentSchema = new Schema(
   { versionKey: "__v" }
 );
 
+DocumentSchema.pre("save", function (next) {
+  if (this.isModified("content")) {
+    this.increment(); // Increment the versionKey (__v)
+  }
+  next();
+});
+
 const DocumentModel = model("DocumentSchema", DocumentSchema);
 
 export { DocumentModel };

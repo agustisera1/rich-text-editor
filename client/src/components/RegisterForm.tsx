@@ -45,34 +45,37 @@ export const RegisterForm = () => {
   }, [registerStatus, navigate]);
 
   return (
-    <form onSubmit={handleRegister} className="card">
-      <p>Create your account</p>
-      <input
-        ref={createUsernameRef}
-        required
-        type="text"
-        placeholder="username"
-      />
-      <input
-        ref={createEmailRef}
-        required
-        type="email"
-        placeholder="me@email.com"
-      />
-      <input
-        ref={createPasswordRef}
-        required
-        type="password"
-        placeholder="password"
-      />
+    <>
+      <h1>Nolte docs</h1>
+      <form onSubmit={handleRegister} className="card register">
+        <p>Create your account</p>
+        <input
+          ref={createUsernameRef}
+          required
+          type="text"
+          placeholder="username"
+        />
+        <input
+          ref={createEmailRef}
+          required
+          type="email"
+          placeholder="me@email.com"
+        />
+        <input
+          ref={createPasswordRef}
+          required
+          type="password"
+          placeholder="password"
+        />
 
-      <button
-        disabled={registerStatus.pending}
-        type="submit"
-        className="primary"
-      >
-        {registerStatus.pending ? "..." : "Register"}
-      </button>
-    </form>
+        <button
+          disabled={registerStatus.pending}
+          type="submit"
+          className="primary"
+        >
+          {registerStatus.pending ? "..." : "Register"}
+        </button>
+      </form>
+    </>
   );
 };

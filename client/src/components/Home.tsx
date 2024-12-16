@@ -14,7 +14,7 @@ export const Home = () => {
 
   return (
     <>
-      <h1>Nolte Docs</h1>
+      <h1>Nolte docs</h1>
       <section className="card">
         <p>
           Welcome to Nolte Docs, your collaborative rich text editor. Create,

@@ -32,10 +32,7 @@ createRoot(document.getElementById("root")!).render(
         <Routes>
           <Route path={paths.home} element={<Home />} />
           <Route path={paths.login} element={<LoginForm />} />
-          <Route
-            path={paths.register}
-            element={withPageLayout(<RegisterForm />)}
-          />
+          <Route path={paths.register} element={<RegisterForm />} />
           <Route
             path={paths.documents}
             element={withPageLayout(<Documents />, true)}

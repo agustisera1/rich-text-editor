@@ -3,9 +3,7 @@ export const paths = {
   register: "/register",
   documents: "/documents",
   document: ":id",
-  editor: "/editor",
   home: "/",
-  notFound: "/notFound",
 };
 
 /* Move to vite .env file */
