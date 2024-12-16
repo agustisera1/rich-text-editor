@@ -1,12 +1,13 @@
 import StarterKit from "@tiptap/starter-kit";
 import { useEditor, Editor, EditorContent } from "@tiptap/react";
 import { useWebSocket } from "@hooks";
-import { useOutletContext, useParams } from "react-router";
+import { Link, useOutletContext, useParams } from "react-router";
 import { useEffect, useState } from "react";
 import { MenuBar } from "./MenuBar";
 import { CursorPosition } from "./CursorPosition";
 import { EditorContext } from "../providers";
 import { TSerializedDocument } from "@api";
+import { paths } from "../constants";
 
 const extensions = [StarterKit];
 
@@ -62,6 +63,9 @@ export const DocumentDetail = () => {
 
   return (
     <div className="editor-wrapper">
+      <Link style={{ width: "80px" }} to={paths.documents}>
+        Documents
+      </Link>
       <EditorContext.Provider
         value={{ editor, documents, socket, participants }}
       >

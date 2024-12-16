@@ -12,7 +12,7 @@ const initialState: ServiceResponse<null> = {
 
 export const LoginForm = () => {
   const navigate = useNavigate();
-  const { logUser } = useAuth();
+  const { logUser, isLogged } = useAuth();
   const [loginStatus, setLoginStatus] =
     useState<ServiceResponse<null>>(initialState);
 
@@ -31,6 +31,10 @@ export const LoginForm = () => {
   };
 
   useEffect(() => {
+    if (isLogged) navigate(paths.documents);
+  }, [isLogged, navigate]);
+
+  useEffect(() => {
     const { success, error } = loginStatus;
     if (success) navigate(paths.documents);
     if (error) {
@@ -46,14 +50,14 @@ export const LoginForm = () => {
         <p>Please enter your username and password to log in.</p>
         <input
           required
-          className="editor-input"
+          className="editor-input form-input"
           ref={usernameRef}
           type="text"
           placeholder="username"
         />
         <input
           required
-          className="editor-input"
+          className="editor-input form-input"
           ref={passwordRef}
           type="password"
           placeholder="password"
