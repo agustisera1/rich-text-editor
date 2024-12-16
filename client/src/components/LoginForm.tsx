@@ -19,7 +19,8 @@ export const LoginForm = () => {
   const usernameRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
 
-  const handleLogin = async () => {
+  const handleLogin: React.FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault();
     const username = usernameRef.current?.value;
     const password = passwordRef.current?.value;
     if (username && password) {
@@ -41,14 +42,26 @@ export const LoginForm = () => {
   return (
     <>
       <h1>Nolte docs</h1>
-      <section className="card">
+      <form onSubmit={handleLogin} className="card">
         <p>Please enter your username and password to log in.</p>
-        <input ref={usernameRef} type="text" placeholder="username" />
-        <input ref={passwordRef} type="password" placeholder="password" />
-        <button className="primary" onClick={handleLogin} disabled={false}>
+        <input
+          required
+          className="editor-input"
+          ref={usernameRef}
+          type="text"
+          placeholder="username"
+        />
+        <input
+          required
+          className="editor-input"
+          ref={passwordRef}
+          type="password"
+          placeholder="password"
+        />
+        <button type="submit" className="primary" disabled={false}>
           {loginStatus.pending ? "..." : "Login"}
         </button>
-      </section>
+      </form>
     </>
   );
 };

@@ -45,7 +45,6 @@ export const DocumentDetail = () => {
       socket.emit("join-document", documentID);
       socket.emit("get-room-participants", documentID);
       socket.on("users-connected", (users) => {
-        console.log(users);
         setParticipants(
           users[documentID as string].filter(
             (user: string) => user !== socket.id

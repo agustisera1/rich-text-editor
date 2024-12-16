@@ -4,3 +4,4 @@ export * from "./Documents";
 export * from "./ProtectedRoute";
 export * from "./Home";
 export * from "./DocumentDetail";
+export * from "./NotFound";

@@ -9,6 +9,7 @@ import {
   ProtectedRoute,
   Home,
   DocumentDetail,
+  NotFound,
 } from "./components";
 import { paths } from "./constants";
 import { PageLayout } from "./components/PageLayout";
@@ -39,6 +40,7 @@ createRoot(document.getElementById("root")!).render(
           >
             <Route path={paths.document} element={<DocumentDetail />} />
           </Route>
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

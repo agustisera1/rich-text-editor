@@ -114,7 +114,7 @@ nav {
 
 .page-layout {
   display: flex;
-  margin-top: 75px;
+  /* margin-top: 25px; */
 }
 
 .page-content {

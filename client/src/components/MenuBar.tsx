@@ -1,6 +1,6 @@
 import { BoldIcon, TrashIcon, ItalicIcon, SaveIcon } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
-import { useCallback, useContext, useEffect, useRef } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { EditorContext } from "../providers";
 import {
   deleteDocument as deleteDocumentService,
@@ -22,6 +22,7 @@ export const MenuBar = ({
   autosave = false,
   autosaveInterval = 5 /* It's a better approach use a debouncer function for autosave.*/,
 }: MenuBarProps) => {
+  const [isSaving, setIsSaving] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const { id: documentID } = useParams() as { id: string };
   const { participants, editor, documents, socket } = useContext(EditorContext);
@@ -29,11 +30,12 @@ export const MenuBar = ({
 
   const saveDocument = useCallback(async () => {
     if (editor) {
+      setIsSaving(true);
       const { success } = await updateDocument(documentID, {
         content: editor.getText(),
         name: nameInputRef.current?.value || "Untitled",
       });
-
+      setIsSaving(false);
       if (success && autosave) return;
       if (success && !autosave) alert("Document saved successfully");
     }
@@ -53,13 +55,13 @@ export const MenuBar = ({
 
   useEffect(() => {
     if (autosave && editor) {
+      /* Using a debouncer is the best choice for this. To be replaced */
       const interval = setInterval(() => {
         socket?.emit("autosave", {
           content: editor.getText(),
           name: nameInputRef.current?.value || "Untitled",
         });
       }, autosaveInterval * 1000);
-
       return () => clearInterval(interval);
     }
   }, [socket, saveDocument, autosave, editor, autosaveInterval]);
@@ -108,9 +110,15 @@ export const MenuBar = ({
             <TrashIcon size={15} />
           </button>
           {autosave ? (
-            <p className="autosave-label">Auto save enabled</p>
+            <p className="autosave-label">
+              {isSaving ? "Saving" : "Auto save enabled"}
+            </p>
           ) : (
-            <button className="editor-button" onClick={saveDocument}>
+            <button
+              disabled={isSaving}
+              className="editor-button"
+              onClick={saveDocument}
+            >
               <SaveIcon size={15} />
             </button>
           )}

@@ -1,8 +1,9 @@
-// import { useContext } from "react";
-// import { EditorContext } from "../providers";
-
 export const CursorPosition = () => {
-  // const ctx = useContext(EditorContext);
-  //   console.log({ participants, editor, socket });
+  /* To be done:
+    - Enhance cursor position and presence for each participant in the document.
+    - Provide username initials for active avatar
+    - Kepp track of the cursor when clicking the user avatar
+    const { editor } = useContext(EditorContext);
+  */
   return null;
 };

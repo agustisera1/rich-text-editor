@@ -51,18 +51,21 @@ export const RegisterForm = () => {
         <p>Create your account</p>
         <input
           ref={createUsernameRef}
+          className="editor-input"
           required
           type="text"
           placeholder="username"
         />
         <input
           ref={createEmailRef}
+          className="editor-input"
           required
           type="email"
           placeholder="me@email.com"
         />
         <input
           ref={createPasswordRef}
+          className="editor-input"
           required
           type="password"
           placeholder="password"
