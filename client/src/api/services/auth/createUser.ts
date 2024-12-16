@@ -1,5 +1,3 @@
-import { serverURL } from "../../../constants";
-
 type CreateUserCredentials = {
   username: string;
   password: string;
@@ -7,7 +5,7 @@ type CreateUserCredentials = {
 };
 
 export async function createUser(credentials: CreateUserCredentials) {
-  return await fetch(`${serverURL}/register`, {
+  return await fetch(`${import.meta.env.VITE_SERVER_URL}/register`, {
     body: JSON.stringify(credentials),
     method: "POST",
     headers: { "Content-Type": "application/json" },

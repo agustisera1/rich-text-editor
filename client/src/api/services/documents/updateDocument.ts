@@ -1,5 +1,3 @@
-import { serverURL } from "../../../constants";
-
 type DocumentChanges = {
   content: string;
   name: string;
@@ -9,7 +7,7 @@ export async function updateDocument(
   documentID: string,
   changes: DocumentChanges
 ) {
-  return await fetch(`${serverURL}/documents/${documentID}`, {
+  return await fetch(`${import.meta.env.VITE_SERVER_URL}/documents/${documentID}`, {
     body: JSON.stringify(changes),
     method: "PATCH",
     headers: { "Content-Type": "application/json" },

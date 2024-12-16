@@ -1,4 +1,3 @@
-import { serverURL } from "../../../constants";
 import { User } from "../../../providers/AuthContext";
 
 type CreateDocument = {
@@ -7,7 +6,7 @@ type CreateDocument = {
 };
 
 export async function createDocument(document: CreateDocument) {
-  return await fetch(`${serverURL}/documents`, {
+  return await fetch(`${import.meta.env.VITE_SERVER_URL}/documents`, {
     body: JSON.stringify(document),
     method: "POST",
     headers: { "Content-Type": "application/json" },

@@ -1,7 +1,5 @@
-import { serverURL } from "../../../constants";
-
 export async function deleteDocument(documentID: string) {
-  return await fetch(`${serverURL}/documents/${documentID}`, {
+  return await fetch(`${import.meta.env.VITE_SERVER_URL}/documents/${documentID}`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
   }).then(async (res) => {

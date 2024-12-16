@@ -2,7 +2,6 @@ import StarterKit from "@tiptap/starter-kit";
 import { useEditor, Editor, EditorContent } from "@tiptap/react";
 import { useWebSocket } from "@hooks";
 import { useOutletContext, useParams } from "react-router";
-import { serverURL } from "../constants";
 import { useEffect, useState } from "react";
 import { MenuBar } from "./MenuBar";
 import { CursorPosition } from "./CursorPosition";
@@ -14,7 +13,7 @@ const extensions = [StarterKit];
 export const DocumentDetail = () => {
   const [participants, setParticipants] = useState<string[]>([]);
   /* WARNING: Use wss: protocol instead of HTTP */
-  const { socket } = useWebSocket(serverURL);
+  const { socket } = useWebSocket(import.meta.env.VITE_SERVER_URL);
   const { id: documentID } = useParams();
   const { documents } = useOutletContext() as {
     documents: TSerializedDocument[];

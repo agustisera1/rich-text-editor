@@ -1,6 +1,5 @@
 import Cookies from "js-cookie";
 import { ServiceResponse } from "../types/common";
-import { serverURL } from "../../../constants";
 
 type UserCredentials = {
   username: string;
@@ -8,7 +7,7 @@ type UserCredentials = {
 };
 
 export async function logOut(username: string): Promise<ServiceResponse> {
-  return await fetch(`${serverURL}/logout`, {
+  return await fetch(`${import.meta.env.VITE_SERVER_URL}/logout`, {
     method: "POST",
     headers: { "Content-Type": "application/json", credentials: "include" },
     body: JSON.stringify({ username }),
@@ -32,7 +31,7 @@ export async function logOut(username: string): Promise<ServiceResponse> {
 export async function logUser(
   credentials: UserCredentials
 ): Promise<ServiceResponse<null>> {
-  return await fetch(`${serverURL}/login`, {
+  return await fetch(`${import.meta.env.VITE_SERVER_URL}/login`, {
     body: JSON.stringify(credentials),
     method: "POST",
     headers: { "Content-Type": "application/json", credentials: "include" },

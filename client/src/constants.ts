@@ -5,6 +5,3 @@ export const paths = {
   document: ":id",
   home: "/",
 };
-
-/* Move to vite .env file */
-export const serverURL = "http://localhost:3001";

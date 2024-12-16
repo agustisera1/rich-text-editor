@@ -1,4 +1,3 @@
-import { serverURL } from "../../../constants";
 import { User } from "../../../providers/AuthContext";
 import { ServiceResponse } from "../types/common";
 
@@ -31,24 +30,24 @@ function serializeDocument({ __v, _id, ...rest }: TDocument) {
 export async function getDocuments(): Promise<
   ServiceResponse<TSerializedDocument[]>
 > {
-  return await fetch(`${serverURL}/documents`, { method: "GET" }).then(
-    async (res) => {
-      const documents = (await res
-        .json()
-        .then(({ documents }) => documents)) as TDocument[];
-      if (res.status === 200) {
-        return {
-          success: true,
-          error: null,
-          data: documents.map(serializeDocument),
-        };
-      } else {
-        return {
-          success: false,
-          error: "An error occurred while fetching the documents",
-          data: [],
-        };
-      }
+  return await fetch(`${import.meta.env.VITE_SERVER_URL}/documents`, {
+    method: "GET",
+  }).then(async (res) => {
+    const documents = (await res
+      .json()
+      .then(({ documents }) => documents)) as TDocument[];
+    if (res.status === 200) {
+      return {
+        success: true,
+        error: null,
+        data: documents.map(serializeDocument),
+      };
+    } else {
+      return {
+        success: false,
+        error: "An error occurred while fetching the documents",
+        data: [],
+      };
     }
-  );
+  });
 }
