@@ -9,22 +9,9 @@ const DocumentItem = memo(
   ({ name, lastModified, id, version, author }: TSerializedDocument) => {
     const navigate = useNavigate();
     return (
-      <div
-        style={{
-          cursor: "pointer",
-          display: "block",
-          textAlign: "center",
-          border: "1px solid gray",
-          padding: "1rem",
-          borderRadius: "0.5rem",
-        }}
-        key={id}
-        onClick={() => navigate(`${id}`)}
-      >
+      <div className="document-item" key={id} onClick={() => navigate(`${id}`)}>
         <FileIcon size={30} strokeWidth={1} />
-        <p style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
-          {name || "Untitled"}
-        </p>
+        <p className="document-item-name">{name || "Untitled"}</p>
         <p>Last modified: {formatDate(lastModified)}</p>
         <p>Owner: {author?.email}</p>
         <p>Version: {version}</p>

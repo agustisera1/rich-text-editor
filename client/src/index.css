@@ -89,6 +89,20 @@ nav {
   gap: 1rem;
 }
 
+.document-item {
+  cursor: pointer;
+  display: block;
+  text-align: center;
+  border: 1px solid gray;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.document-item-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
 .add-document-button {
   width: 100px;
   text-align: center;
