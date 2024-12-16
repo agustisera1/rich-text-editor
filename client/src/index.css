@@ -188,7 +188,13 @@ nav {
   display: flex;
   gap: 0.5rem;
   margin-left: 0.5rem;
-  justify-content: space-between;
+  justify-content: flex-start;
+}
+
+.autosave-label {
+  color: darkgray;
+  font-size: 0.8rem;
+  align-self: center;
 }
 
 .nav-title {

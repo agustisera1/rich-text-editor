@@ -20,7 +20,7 @@ interface MenuBarProps {
 
 export const MenuBar = ({
   autosave = false,
-  autosaveInterval = 5,
+  autosaveInterval = 5 /* It's a better approach use a debouncer function for autosave.*/,
 }: MenuBarProps) => {
   const nameInputRef = useRef<HTMLInputElement>(null);
   const { id: documentID } = useParams() as { id: string };
@@ -34,6 +34,7 @@ export const MenuBar = ({
         name: nameInputRef.current?.value || "Untitled",
       });
 
+      if (success && autosave) return;
       if (success && !autosave) alert("Document saved successfully");
     }
   }, [editor, documentID, autosave]);
@@ -85,7 +86,7 @@ export const MenuBar = ({
         defaultValue={document?.name}
       />
       <div className="editor-buttons-container">
-        <div>
+        <>
           <button
             className={`editor-button ${
               editor.isActive("italic") && "active-btn"
@@ -102,13 +103,18 @@ export const MenuBar = ({
           >
             <BoldIcon size={15} />
           </button>
-          <button className="editor-button" onClick={saveDocument}>
-            <SaveIcon size={15} />
-          </button>
+
           <button className="editor-button" onClick={deleteDocument}>
             <TrashIcon size={15} />
           </button>
-        </div>
+          {autosave ? (
+            <p className="autosave-label">Auto save enabled</p>
+          ) : (
+            <button className="editor-button" onClick={saveDocument}>
+              <SaveIcon size={15} />
+            </button>
+          )}
+        </>
         {!!participants.length && (
           <div className="participants-container">
             {participants.map((participant) => (

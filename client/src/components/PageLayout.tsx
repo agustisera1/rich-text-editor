@@ -13,6 +13,10 @@ export const PageLayout: React.FC<PropsWithChildren> = ({ children }) => {
       navigate(paths.documents);
   };
 
+  const handleAvatarClick = () => {
+    if (confirm("Log out?")) logOut();
+  };
+
   return (
     <div className="page-layout">
       <nav className="navbar">
@@ -20,7 +24,7 @@ export const PageLayout: React.FC<PropsWithChildren> = ({ children }) => {
           Nolte docs
         </p>
         {isLogged && user?.username && (
-          <button className="nav-button primary" onClick={logOut}>
+          <button className="nav-button primary" onClick={handleAvatarClick}>
             {user.email.slice(0, 1).toUpperCase()}
           </button>
         )}

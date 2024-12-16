@@ -150,7 +150,6 @@ const io = new Server(expressServer, {
 
 io.on("connection", (socket) => {
   socket.on("join-document", async (documentId) => {
-    console.log("User joined");
     const document = await DocumentModel.findById(documentId);
     if (document) {
       if (!participants[documentId]) {
@@ -159,15 +158,17 @@ io.on("connection", (socket) => {
         participants[documentId].push(socket.id);
       }
 
-      socket.emit("users-connected", participants);
       socket.join(documentId);
+      socket.broadcast.emit("users-connected", participants);
       socket.emit("load-document", document.content);
+      socket.on("get-room-participants", () => {
+        socket.emit("users-connected", participants);
+      });
       socket.on("send-changes", (delta) => {
         socket.broadcast.to(documentId).emit("recieve-changes", delta);
       });
 
       socket.on("autosave", async ({ content, name }) => {
-        console.log("Autosave called");
         const result = await DocumentModel.findByIdAndUpdate(documentId, {
           name,
           content,
@@ -186,7 +187,7 @@ io.on("connection", (socket) => {
       participants[documentId] = participants[documentId]?.filter(
         (id) => id !== socket.id
       );
-      socket.emit("users-connected", participants);
+      socket.broadcast.emit("users-connected", participants);
       console.log("user disconnected");
     });
   });
