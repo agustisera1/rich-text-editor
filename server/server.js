@@ -3,8 +3,12 @@ import cors from "cors";
 import express from "express";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
-import { connect } from "mongoose";
 import { DocumentModel, UserModel } from "./models/index.js";
+import { connect } from "mongoose";
+import { Server } from "socket.io";
+import { events } from "./socket.js";
+
+const { JOIN_DOCUMENT } = events;
 
 async function connectToDatabase() {
   await connect(process.env.DB_URI);
@@ -20,6 +24,7 @@ server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 server.use(cookieParser());
 
+/* Auth endpoints */
 server.post("/register", async (req, res) => {
   const { username, password, email } = req.body;
   try {
@@ -33,8 +38,7 @@ server.post("/register", async (req, res) => {
   }
 });
 
-server.post("/logout", (req, res) => {
-  console.log("User logout", req.body.username);
+server.post("/logout", (_, res) => {
   res.clearCookie("token");
   res.clearCookie("username");
   res.clearCookie("email");
@@ -61,9 +65,9 @@ server.post("/login", async (req, res) => {
       secure: process.env.NODE_ENV === "production",
     });
     /*
-      The token houldn't be sent over json.
-      res.cookie is already setting the cookie at the headers response but still needs a tweak
-      on headers and browser config to make it work
+      The token shouldn't be sent over json.
+      this is setting the cookie at the headers response but still needs a tweak
+      to make it work. Token must be removed from the response body.
     */
     res.status(200).send({
       success: true,
@@ -77,28 +81,114 @@ server.post("/login", async (req, res) => {
   }
 });
 
-server.get("/add/:docname", async (req, res) => {
-  const { docname } = req.params;
-  const newDoc = new DocumentModel({ name: docname });
-
-  const doc = await DocumentModel.findOne({ name: docname });
-  !doc
-    ? (() => {
-        newDoc.save();
-        res.status(201);
-      })()
-    : (() => {
-        res.status(400);
-      })();
-
-  newDoc.save();
+/* Document endpoints */
+server.get("/documents", async (_, res) => {
+  const documents = await DocumentModel.find();
+  res.status(200).json({ documents });
 });
 
-server.get("/doclist", async (req, res) => {
-  const docs = await DocumentModel.find();
-  res.status(200).json(docs);
+server.post("/documents", async (req, res) => {
+  const { name, author } = req.body;
+  try {
+    const document = new DocumentModel({
+      name,
+      author,
+    }); /* Content fallsback to "" */
+    await document.save();
+    res.status(201).json(document);
+  } catch (error) {
+    res.status(500).json({ error: "Error while creating a new document" });
+  }
 });
 
-server.listen(port, () => {
+server.patch("/documents/:id", async (req, res) => {
+  const { id } = req.params;
+  const { name, content } = req.body;
+  try {
+    const document = await DocumentModel.findByIdAndUpdate(id, {
+      name,
+      content,
+      lastModified: new Date(),
+    });
+    if (!document) throw new Error("Document not found");
+    res.status(200).send({ success: true, message: "Document updated" });
+  } catch (error) {
+    res.status(400).send({ success: false, message: error.message });
+  }
+});
+
+server.get("/documents/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const document = await DocumentModel.findById(id);
+    if (!document) throw new Error("Document not found");
+    res.status(200).send({ success: true, document });
+  } catch (error) {
+    res.status(400).send({ success: false, message: error.message });
+  }
+});
+
+server.delete("/documents/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const document = await DocumentModel.findByIdAndDelete(id);
+    if (!document) throw new Error("Document not found");
+    res.status(200).send({ success: true, message: "Document deleted" });
+  } catch (error) {
+    res.status(400).send({ success: false, message: error.message });
+  }
+});
+
+const expressServer = server.listen(port, () => {
   console.info("App listening on port: ", port);
+});
+
+/* Socket connections */
+const rooms = {};
+const io = new Server(expressServer, {
+  cors: {
+    origin: process.env.ORIGIN,
+  },
+});
+
+io.on(events.CONNECTION, (socket) => {
+  socket.on(JOIN_DOCUMENT, async (documentId) => {
+    const document = await DocumentModel.findById(documentId);
+    if (document) {
+      if (!rooms[documentId]) {
+        rooms[documentId] = [];
+      } else {
+        rooms[documentId].push(socket.id);
+      }
+
+      socket.join(documentId);
+      socket.broadcast.emit(events.USERS_CONNECTED, rooms);
+      socket.emit(events.LOAD_DOCUMENT, document.content);
+      socket.on(events.GET_ROOM_PARTICIPANTS, () => {
+        socket.emit(events.USERS_CONNECTED, rooms);
+      });
+      socket.on(events.SEND_CHANGES, (delta) => {
+        socket.broadcast.to(documentId).emit(events.RECEIVE_CHANGES, delta);
+      });
+
+      socket.on(events.AUTOSAVE, async ({ content, name }) => {
+        const result = await DocumentModel.findByIdAndUpdate(documentId, {
+          name,
+          content,
+          lastModified: new Date(),
+        });
+
+        if (!result)
+          socket.emit(
+            events.ALERT,
+            "Failed to save the document. Please check your connection" /* Emmulate a network issue for autosave */
+          );
+      });
+    }
+
+    socket.on(events.DISCONNECT, () => {
+      rooms[documentId] = rooms[documentId]?.filter((id) => id !== socket.id);
+      socket.broadcast.emit(events.USERS_CONNECTED, rooms);
+    });
+  });
 });

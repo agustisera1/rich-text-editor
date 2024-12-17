@@ -2,13 +2,14 @@ import "./index.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
-import { loadDocuments } from "./api";
 import {
   LoginForm,
   RegisterForm,
   Documents,
   ProtectedRoute,
   Home,
+  DocumentDetail,
+  NotFound,
 } from "./components";
 import { paths } from "./constants";
 import { PageLayout } from "./components/PageLayout";
@@ -32,15 +33,14 @@ createRoot(document.getElementById("root")!).render(
         <Routes>
           <Route path={paths.home} element={<Home />} />
           <Route path={paths.login} element={<LoginForm />} />
-          <Route
-            path={paths.register}
-            element={withPageLayout(<RegisterForm />)}
-          />
+          <Route path={paths.register} element={<RegisterForm />} />
           <Route
             path={paths.documents}
             element={withPageLayout(<Documents />, true)}
-            loader={loadDocuments}
-          />
+          >
+            <Route path={paths.document} element={<DocumentDetail />} />
+          </Route>
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

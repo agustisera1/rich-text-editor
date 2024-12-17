@@ -3,11 +3,24 @@ import {
   logUser as logUserService,
   logOut as logOutUserService,
   createUser,
-} from "../api/services";
+} from "@api";
 import { useContext } from "react";
 import { AuthContext } from "../providers/AuthContext";
 
-/** useAuth: Normally, we would use a framework to handle auth */
+/**
+ *
+ * This hook provides methods to log in, log out, and create a user. It also provides
+ * the current authentication state and user information.
+ *
+ * @returns {object} An object containing:
+ * - `user`: The current user information (username and email).
+ * - `isLogged`: A boolean indicating if the user is logged in.
+ * - `logUser`: A function to log in a user with given credentials.
+ * - `logOut`: A function to log out the current user.
+ * - `createUser`: A function to create a new user.
+ *
+ * @throws {Error} If the hook is used outside of an AuthProvider.
+ */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within AuthProvider");

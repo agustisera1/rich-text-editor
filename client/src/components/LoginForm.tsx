@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../hooks";
 import { useNavigate } from "react-router";
-import { ServiceResponse } from "../types/common";
+import { ServiceResponse } from "@api";
 import { paths } from "../constants";
 
 const initialState: ServiceResponse<null> = {
@@ -12,14 +12,15 @@ const initialState: ServiceResponse<null> = {
 
 export const LoginForm = () => {
   const navigate = useNavigate();
-  const { logUser } = useAuth();
+  const { logUser, isLogged } = useAuth();
   const [loginStatus, setLoginStatus] =
     useState<ServiceResponse<null>>(initialState);
 
   const usernameRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
 
-  const handleLogin = async () => {
+  const handleLogin: React.FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault();
     const username = usernameRef.current?.value;
     const password = passwordRef.current?.value;
     if (username && password) {
@@ -28,6 +29,10 @@ export const LoginForm = () => {
       setLoginStatus({ ...response, pending: false });
     }
   };
+
+  useEffect(() => {
+    if (isLogged) navigate(paths.documents);
+  }, [isLogged, navigate]);
 
   useEffect(() => {
     const { success, error } = loginStatus;
@@ -39,13 +44,28 @@ export const LoginForm = () => {
   }, [loginStatus, navigate]);
 
   return (
-    <section className="card">
-      <p>Please enter your username and password to log in.</p>
-      <input ref={usernameRef} type="text" placeholder="username" />
-      <input ref={passwordRef} type="password" placeholder="password" />
-      <button className="primary" onClick={handleLogin} disabled={false}>
-        {loginStatus.pending ? "..." : "Login"}
-      </button>
-    </section>
+    <>
+      <h1>Nolte docs</h1>
+      <form onSubmit={handleLogin} className="card">
+        <p>Please enter your username and password to log in.</p>
+        <input
+          required
+          className="editor-input form-input"
+          ref={usernameRef}
+          type="text"
+          placeholder="username"
+        />
+        <input
+          required
+          className="editor-input form-input"
+          ref={passwordRef}
+          type="password"
+          placeholder="password"
+        />
+        <button type="submit" className="primary" disabled={false}>
+          {loginStatus.pending ? "..." : "Login"}
+        </button>
+      </form>
+    </>
   );
 };

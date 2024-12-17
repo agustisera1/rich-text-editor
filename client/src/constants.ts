@@ -2,8 +2,6 @@ export const paths = {
   login: "/login",
   register: "/register",
   documents: "/documents",
-  editor: "/editor",
-  document: "/document",
+  document: ":id",
   home: "/",
-  notFound: "/notFound",
-}
+};
