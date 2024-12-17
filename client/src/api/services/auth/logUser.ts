@@ -6,6 +6,14 @@ type UserCredentials = {
   password: string;
 };
 
+/**
+ * Logs out the user by sending a POST request to the server's logout endpoint.
+ *
+ * @param {string} username - The username of the user to log out.
+ * @returns {Promise<ServiceResponse>} A promise that resolves to a ServiceResponse object indicating the success or failure of the logout operation.
+ *
+ * Note: Proper error handling and mapping of status codes should be enhanced in the future.
+ */
 export async function logOut(username: string): Promise<ServiceResponse> {
   return await fetch(`${import.meta.env.VITE_SERVER_URL}/logout`, {
     method: "POST",
@@ -28,6 +36,15 @@ export async function logOut(username: string): Promise<ServiceResponse> {
   });
 }
 
+/**
+ * Authenticates a user with the provided credentials.
+ *
+ * @param credentials - An object containing the username and password of the user.
+ * @returns A promise that resolves to a ServiceResponse object indicating the success or failure of the login attempt.
+ *
+ * @remarks
+ * - On successful login, the function sets cookies for the token, username, and email with an expiration time of `1 hour`.
+ */
 export async function logUser(
   credentials: UserCredentials
 ): Promise<ServiceResponse<null>> {

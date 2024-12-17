@@ -8,6 +8,18 @@ const initialState: ServiceResponse<TSerializedDocument[]> = {
   data: [],
 };
 
+/**
+ * Custom hook to fetch and manage documents.
+ *
+ * @returns {Object} An object containing:
+ * - `documents`: A sorted array of serialized documents.
+ * - `error`: Any error that occurred during the fetch operation.
+ * - `pending`: A boolean indicating if the fetch operation is in progress.
+ * - `revalidate`: A function to re-fetch the documents.
+ *
+ * @example
+ * const { documents, error, pending, revalidate } = useDocuments();
+ */
 export const useDocuments = () => {
   const [documentsResponse, setDocumentsResponse] =
     useState<ServiceResponse<TSerializedDocument[]>>(initialState);
@@ -26,7 +38,9 @@ export const useDocuments = () => {
   }, [fetchDocuments]);
 
   return {
-    documents: (documentsResponse.data as TSerializedDocument[]).sort(),
+    documents: (
+      documentsResponse.data as TSerializedDocument[]
+    ).sort() /* To be done: sort documents by modification date*/,
     error: documentsResponse.error,
     pending: documentsResponse.pending,
     revalidate: fetchDocuments,

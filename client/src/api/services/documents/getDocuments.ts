@@ -27,6 +27,16 @@ function serializeDocument({ __v, _id, ...rest }: TDocument) {
   };
 }
 
+/**
+ * Fetches the list of documents from the server and returns a serialized response.
+ *
+ * @returns {Promise<ServiceResponse<TSerializedDocument[]>>} A promise that resolves to a service response containing an array of serialized documents.
+ * The service response contains:
+ * - `success`: A boolean indicating whether the request was successful.
+ * - `error`: A string containing an error message if the request failed, otherwise `null`.
+ * - `data`: An array of serialized documents if the request was successful, otherwise an empty array.
+ * @see TSerializedDocument
+ */
 export async function getDocuments(): Promise<
   ServiceResponse<TSerializedDocument[]>
 > {

@@ -15,7 +15,7 @@ import {
 
 interface MenuBarProps {
   autosave?: boolean;
-  autosaveInterval: number;
+  autosaveInterval?: number;
 }
 
 export const MenuBar = ({

@@ -69,7 +69,7 @@ export const DocumentDetail = () => {
       <EditorContext.Provider
         value={{ editor, documents, socket, participants }}
       >
-        <MenuBar autosave={true} autosaveInterval={10} />
+        <MenuBar />
         <CursorPosition />
         <EditorContent editor={editor} />
       </EditorContext.Provider>

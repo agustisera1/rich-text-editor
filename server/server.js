@@ -3,9 +3,12 @@ import cors from "cors";
 import express from "express";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
+import { DocumentModel, UserModel } from "./models/index.js";
 import { connect } from "mongoose";
 import { Server } from "socket.io";
-import { DocumentModel, UserModel } from "./models/index.js";
+import { events } from "./socket.js";
+
+const { JOIN_DOCUMENT } = events;
 
 async function connectToDatabase() {
   await connect(process.env.DB_URI);
@@ -79,7 +82,7 @@ server.post("/login", async (req, res) => {
 });
 
 /* Document endpoints */
-server.get("/documents", async (req, res) => {
+server.get("/documents", async (_, res) => {
   const documents = await DocumentModel.find();
   res.status(200).json({ documents });
 });
@@ -141,34 +144,34 @@ const expressServer = server.listen(port, () => {
 });
 
 /* Socket connections */
-const participants = {};
+const rooms = {};
 const io = new Server(expressServer, {
   cors: {
     origin: process.env.ORIGIN,
   },
 });
 
-io.on("connection", (socket) => {
-  socket.on("join-document", async (documentId) => {
+io.on(events.CONNECTION, (socket) => {
+  socket.on(JOIN_DOCUMENT, async (documentId) => {
     const document = await DocumentModel.findById(documentId);
     if (document) {
-      if (!participants[documentId]) {
-        participants[documentId] = [];
+      if (!rooms[documentId]) {
+        rooms[documentId] = [];
       } else {
-        participants[documentId].push(socket.id);
+        rooms[documentId].push(socket.id);
       }
 
       socket.join(documentId);
-      socket.broadcast.emit("users-connected", participants);
-      socket.emit("load-document", document.content);
-      socket.on("get-room-participants", () => {
-        socket.emit("users-connected", participants);
+      socket.broadcast.emit(events.USERS_CONNECTED, rooms);
+      socket.emit(events.LOAD_DOCUMENT, document.content);
+      socket.on(events.GET_ROOM_PARTICIPANTS, () => {
+        socket.emit(events.USERS_CONNECTED, rooms);
       });
-      socket.on("send-changes", (delta) => {
-        socket.broadcast.to(documentId).emit("recieve-changes", delta);
+      socket.on(events.SEND_CHANGES, (delta) => {
+        socket.broadcast.to(documentId).emit(events.RECEIVE_CHANGES, delta);
       });
 
-      socket.on("autosave", async ({ content, name }) => {
+      socket.on(events.AUTOSAVE, async ({ content, name }) => {
         const result = await DocumentModel.findByIdAndUpdate(documentId, {
           name,
           content,
@@ -177,18 +180,15 @@ io.on("connection", (socket) => {
 
         if (!result)
           socket.emit(
-            "alert",
+            events.ALERT,
             "Failed to save the document. Please check your connection" /* Emmulate a network issue for autosave */
           );
       });
     }
 
-    socket.on("disconnect", () => {
-      participants[documentId] = participants[documentId]?.filter(
-        (id) => id !== socket.id
-      );
-      socket.broadcast.emit("users-connected", participants);
-      console.log("user disconnected");
+    socket.on(events.DISCONNECT, () => {
+      rooms[documentId] = rooms[documentId]?.filter((id) => id !== socket.id);
+      socket.broadcast.emit(events.USERS_CONNECTED, rooms);
     });
   });
 });
